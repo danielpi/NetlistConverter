@@ -72,6 +72,83 @@ class Net {
 }
 
 
+let a = ["a","b","c","b"]
+find(a,"b")
+find(a,"d")
+let indexes = filter(a){ $0 == "b" }
+println(indexes)
+
+class ConnectionMatrix {
+    let rowHeaders: String[]
+    let colHeaders: String[]
+    var grid: Bool[]
+    init(rowHeaders: String[], colHeaders: String[]) {
+        let rowSet = NSSet(array: rowHeaders)
+        let colSet = NSSet(array: colHeaders)
+        assert(rowHeaders.count == rowSet.count, "There are duplicate labels in the Row Headers")
+        assert(colHeaders.count == colSet.count, "There are duplicate labels in the Column Headers")
+            
+        self.rowHeaders = rowHeaders
+        self.colHeaders = colHeaders
+        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+    }
+    
+    func indexIsValidForRow(row: Int, column: Int) -> Bool {
+        return row >= 0 && row < rowHeaders.count && column >= 0 && column < colHeaders.count
+    }
+    func indexFor(label: String, inHeader header: String[]) -> Int {
+        var index: Int = 0
+        if let ind = find(header, label) {
+            index = ind
+        } else {
+            assert(false, "No row with that label")
+        }
+        return index
+    }
+    func indexFor(#rowLabel: String) -> Int { return self.indexFor(rowLabel, inHeader: rowHeaders) }
+    func indexFor(#colLabel: String) -> Int { return self.indexFor(colLabel, inHeader: colHeaders) }
+    
+    subscript(rowLabel: String, colLabel: String) -> Bool {
+        get {
+            let row = indexFor(rowLabel: rowLabel)
+            let column = indexFor(colLabel: colLabel)
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            return grid[(row * colHeaders.count) + column]
+        }
+        set {
+            let row = indexFor(rowLabel: rowLabel)
+            let column = indexFor(colLabel: colLabel)
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            grid[(row * colHeaders.count) + column] = newValue
+        }
+    }
+    
+    func description() -> String {
+        // Create the column header
+        var response = "\t"
+        for label in colHeaders {
+            response += "\(label)\t"
+        }
+        response += "\n"
+        
+        // Create each row
+        for row in rowHeaders {
+            response += "\(row):\t"
+            for col in colHeaders {
+                let status = self[row,col] ? 1 : 0
+                response += "\(status)\t"
+            }
+            response += "\n"
+        }
+        
+        return response
+    }
+    func prettyPrint() {
+        print(self.description())
+    }
+}
+
+
 class Netlist {
     var components: Component[] = []
     var nets: Net[] = []
@@ -170,111 +247,12 @@ class Netlist {
         }
         return response
     }
-}
-
-let a = ["a","b","c"]
-
-
-
-class ConnectionMatrix {
-    let rowHeaders: String[]
-    let colHeaders: String[]
-    var grid: Bool[]
-    init(rowHeaders: String[], colHeaders: String[]) {
-        self.rowHeaders = rowHeaders
-        self.colHeaders = colHeaders
-        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
-    }
-    
-    func indexIsValidForRow(row: Int, column: Int) -> Bool {
-        return row >= 0 && row < rowHeaders.count && column >= 0 && column < colHeaders.count
-    }
-    func indexFor(label: String, inHeader header: String[]) -> Int {
-        var index: Int = 0
-        if let ind = find(header, label) {
-            index = ind
-        } else {
-            assert("No row with that label")
-        }
-        return index
-    }
-    func indexFor(#rowLabel: String) -> Int { return self.indexFor(rowLabel, inHeader: rowHeaders) }
-    func indexFor(#colLabel: String) -> Int { return self.indexFor(colLabel, inHeader: colHeaders) }
-    
-    subscript(rowLabel: String, colLabel: String) -> Bool {
-        get {
-            let row = indexFor(rowLabel: rowLabel)
-            let column = indexFor(colLabel: colLabel)
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            return grid[(row * colHeaders.count) + column]
-        }
-        set {
-            let row = indexFor(rowLabel: rowLabel)
-            let column = indexFor(colLabel: colLabel)
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            grid[(row * colHeaders.count) + column] = newValue
-        }
-    }
-    
-    func prettyPrint() {
-        // Create the column header
-        var response = "\t"
-        for label in colHeaders {
-            response += "\(label)\t"
-        }
-        response += "\n"
-        
-        // Create each row
-        for row in rowHeaders {
-            response += "\(row):\t"
-            for col in colHeaders {
-                let status = self[row,col] ? 1 : 0
-                response += "\(status)\t"
-            }
-            response += "\n"
-        }
-        
-        print(response)
+    func exportConnectionMatrix2() -> String {
+        let sortedPads = sort(pads) { $0.name < $1.name }
+        var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: sortedPads, colHeaders: sortedPads)
+        return "blah"
     }
 }
-
-var connections = ConnectionMatrix(rowHeaders: ["a","b","c"], colHeaders: ["a","b","c"])
-connections.prettyPrint()
-connections["a","a"] = true
-connections["b","b"] = true
-connections["c","c"] = true
-connections["a","b"] = true
-connections["b","c"] = true
-connections["c","a"] = true
-connections.prettyPrint()
-
-
-struct Matrix {
-    let rows: Int, columns: Int
-    var grid: Double[]
-    init(rows: Int, columns: Int) {
-        self.rows = rows
-        self.columns = columns
-        grid = Array(count: rows * columns, repeatedValue: 0.0)
-    }
-    func indexIsValidForRow(row: Int, column: Int) -> Bool {
-        return row >= 0 && row < rows && column >= 0 && column < columns
-    }
-    subscript(row: Int, column: Int) -> Double {
-        get {
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            return grid[(row * columns) + column]
-        }
-        set {
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            grid[(row * columns) + column] = newValue
-        }
-    }
-}
-var matrix = Matrix(rows: 2, columns: 2)
-matrix[0, 1] = 1.5
-matrix[1, 0] = 3.2
-matrix
 
 
 // Netlist
@@ -298,6 +276,48 @@ println(anotherNetlist.exportConnectionMatrix())
 for pad in anotherNetlist.pads {
     println(pad.net!.description())
 }
+
+/*
+var connections = ConnectionMatrix(rowHeaders: ["a","b","c"], colHeaders: ["a","b","c"])
+connections.prettyPrint()
+connections["a","a"] = true
+connections["b","b"] = true
+connections["c","c"] = true
+connections["a","b"] = true
+connections["b","c"] = true
+connections["c","a"] = true
+connections.prettyPrint()
+// connections["a","d"]
+
+
+struct Matrix {
+let rows: Int, columns: Int
+var grid: Double[]
+init(rows: Int, columns: Int) {
+self.rows = rows
+self.columns = columns
+grid = Array(count: rows * columns, repeatedValue: 0.0)
+}
+func indexIsValidForRow(row: Int, column: Int) -> Bool {
+return row >= 0 && row < rows && column >= 0 && column < columns
+}
+subscript(row: Int, column: Int) -> Double {
+get {
+assert(indexIsValidForRow(row, column: column), "Index out of range")
+return grid[(row * columns) + column]
+}
+set {
+assert(indexIsValidForRow(row, column: column), "Index out of range")
+grid[(row * columns) + column] = newValue
+}
+}
+}
+var matrix = Matrix(rows: 2, columns: 2)
+matrix[0, 1] = 1.5
+matrix[1, 0] = 3.2
+matrix
+*/
+
 
 
 

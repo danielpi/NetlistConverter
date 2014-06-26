@@ -39,6 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if let contents = fileContents {
                     let fileNetlist = Netlist(fromString: contents)
                     self.netlist = fileNetlist
+                    fileNetlist.prettyPrint()
                 } else {
                     
                 }
@@ -60,6 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let url = panel.URL
                 if let theNetList = self.netlist {
                     let outputString = theNetList.exportConnectionMatrix()
+                    print(outputString)
                     outputString.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
                 }
                 

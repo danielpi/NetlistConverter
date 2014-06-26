@@ -13,11 +13,15 @@ struct Pad {
     let pinName: String?
     let component: Component
     var name: String {
-        var response = component.designator + "-"
+    var response = component.designator + "-"
         if let num = pinNumber {
             response += "\(num)"
         } else {
-            response += "?"
+            if let nam = pinName {
+                response += nam
+            } else {
+                response += "?"
+            }
         }
         return response
     }
@@ -27,8 +31,8 @@ struct Pad {
         return self.name
     }
     /*
-        - I don't have a reliable way of referring to pads that are not named or numbered.
-        - Should the pad have a reference to its net? This makes for a bit of a circular reference that needs to be kept in sync.
+    - I don't have a reliable way of referring to pads that are not named or numbered.
+    - Should the pad have a reference to its net? This makes for a bit of a circular reference that needs to be kept in sync.
     */
 }
 
@@ -54,7 +58,7 @@ struct Component {
         return response
     }
     /*
-        - There should be a library of footprints. If there is then does the footprint contain the pads? Does the Component have a reference to pins?
+    - There should be a library of footprints. If there is then does the footprint contain the pads? Does the Component have a reference to pins?
     */
 }
 
@@ -72,6 +76,93 @@ class Net {
             response += " " + pad.name
         }
         return response
+    }
+}
+
+
+struct ConnectionMatrix {
+    let rowHeaders: String[]
+    let colHeaders: String[]
+    var grid: Bool[]
+    init(rowHeaders: String[], colHeaders: String[]) {
+        let rowSet = NSSet(array: rowHeaders)
+        let colSet = NSSet(array: colHeaders)
+        assert(rowHeaders.count == rowSet.count, "There are duplicate labels in the Row Headers")
+        assert(colHeaders.count == colSet.count, "There are duplicate labels in the Column Headers")
+        
+        self.rowHeaders = rowHeaders
+        self.colHeaders = colHeaders
+        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+    }
+    
+    func indexIsValidForRow(row: Int, column: Int) -> Bool {
+        return row >= 0 && row < rowHeaders.count && column >= 0 && column < colHeaders.count
+    }
+    func indexFor(label: String, inHeader header: String[]) -> Int {
+        var index: Int = 0
+        if let ind = find(header, label) {
+            index = ind
+        } else {
+            assert(false, "No row with that label")
+        }
+        return index
+    }
+    func indexFor(#rowLabel: String) -> Int { return self.indexFor(rowLabel, inHeader: rowHeaders) }
+    func indexFor(#colLabel: String) -> Int { return self.indexFor(colLabel, inHeader: colHeaders) }
+    
+    subscript(rowLabel: String, colLabel: String) -> Bool {
+        get {
+            let row = indexFor(rowLabel: rowLabel)
+            let column = indexFor(colLabel: colLabel)
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            return grid[(row * colHeaders.count) + column]
+        }
+        set {
+            let row = indexFor(rowLabel: rowLabel)
+            let column = indexFor(colLabel: colLabel)
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            grid[(row * colHeaders.count) + column] = newValue
+        }
+    }
+    subscript(row: Int, column: Int) -> Bool {
+        get {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            return grid[(row * colHeaders.count) + column]
+        }
+        set {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
+            grid[(row * colHeaders.count) + column] = newValue
+        }
+    }
+    
+    func description() -> String {
+        // Create the column header
+        var response = "\t\t"
+        for label in colHeaders {
+            response += "\(label) "
+        }
+        response += "\n"
+        
+        /*
+
+for (index, element) in enumerate(list) {
+println("Item \(index): \(element)")
+}*/
+
+        // Create each row
+        for (rowIndex, row) in enumerate(rowHeaders) {
+            response += "\(row):\t"
+            for (colIndex, col) in enumerate(colHeaders) {
+                let status = self[rowIndex, colIndex] ? 1 : 0
+                response += "\(status) "
+            }
+            response += "\n"
+        }
+        
+        return response
+    }
+    func prettyPrint() {
+        print(self.description())
     }
 }
 
@@ -132,7 +223,8 @@ class Netlist {
                 var matchingComponents = self.components.filter { $0.designator == sections[0] }
                 if matchingComponents.count > 0 {
                     var aComponent = matchingComponents[0]
-                    let aPad = Pad(pinNumber: sections[1].toInt(), pinName: nil, component: aComponent, net: aNet)
+                    let name: String? = (sections[1] == "") ? nil : sections[1]
+                    let aPad = Pad(pinNumber: sections[1].toInt(), pinName: name, component: aComponent, net: aNet)
                     pads += aPad
                     aComponent.pads += aPad
                     aNet.pads += aPad
@@ -151,7 +243,7 @@ class Netlist {
         }
     }
     
-    func exportConnectionMatrix() -> String {
+    func exportConnectionMatrix2() -> String {
         var response: String = ""
         let sortedPads = sort(pads) { $0.name < $1.name }
         
@@ -174,4 +266,31 @@ class Netlist {
         }
         return response
     }
+    func exportConnectionMatrix() -> String {
+        let sortedPads = sort(pads) { $0.name < $1.name }
+        let padLabels: String[] = sortedPads.map { $0.name }
+        var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
+        
+        for net in nets {
+            println(net.name)
+            for pad in net.pads {
+                for secondPad in net.pads {
+                    matrix[pad.name, secondPad.name] = true
+                }
+            }
+        }
+        
+        return matrix.description()
+    }
 }
+/*
+let strings = numbers.map {
+    (var number) -> String in
+    var output = ""
+    while number > 0 {
+        output = digitNames[number % 10]! + output
+        number /= 10
+    }
+    return output
+}
+*/
