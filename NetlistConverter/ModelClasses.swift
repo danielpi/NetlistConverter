@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Cocoa
 
 class Pad {
     let pinNumber: Int?
@@ -89,7 +90,7 @@ class Net {
 }
 
 
-struct ConnectionMatrix {
+class ConnectionMatrix {
     let rowHeaders: String[]
     let colHeaders: String[]
     var grid: Bool[]
@@ -102,6 +103,28 @@ struct ConnectionMatrix {
         self.rowHeaders = rowHeaders
         self.colHeaders = colHeaders
         grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+    }
+    init(nets: Net[]) {
+        var headers: NSMutableSet = NSMutableSet()
+        for net in nets {
+            for pad in net.pads {
+                headers.addObject(pad.name)
+            }
+        }
+        let padLabels: String[] = headers.allObjects as String[]
+        let sortedLabels = sort(padLabels)
+        self.rowHeaders = sortedLabels
+        self.colHeaders = sortedLabels
+        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+        
+        for net in nets {
+            println(net.name)
+            for pad in net.pads {
+                for secondPad in net.pads {
+                    self[pad.name, secondPad.name] = true
+                }
+            }
+        }
     }
     
     func indexIsValidForRow(row: Int, column: Int) -> Bool {
@@ -145,6 +168,9 @@ struct ConnectionMatrix {
     }
     
     func description() -> String {
+        var computationLength: Int64 = Int64(rowHeaders.count * colHeaders.count)
+        var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
+        
         // Create the column header
         var response = "\t\t"
         for label in colHeaders {
@@ -158,6 +184,7 @@ struct ConnectionMatrix {
             for (colIndex, col) in enumerate(colHeaders) {
                 let status = self[rowIndex, colIndex] ? 1 : 0
                 response += "\(status) "
+                progress.completedUnitCount++
             }
             response += "\n"
         }
@@ -280,20 +307,32 @@ class Netlist {
         }
     }
     
-    func exportConnectionMatrix() -> String {
+    // Should this be a calculated property???
+    func exportConnectionMatrix() -> ConnectionMatrix {
+        //let matrix: ConnectionMatrix = ConnectionMatrix(nets: nets)
         let sortedPads = sort(pads) { $0.name < $1.name }
         let padLabels: String[] = sortedPads.map { $0.name }
         var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
+        var computationLength: Int64 = Int64(pads.count)
+        var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
-        for net in nets {
+        
+        netLoop: for net in self.nets {
             println(net.name)
             for pad in net.pads {
                 for secondPad in net.pads {
-                    matrix[pad.name, secondPad.name] = true
+                    if progress.cancelled {
+                        break //netLoop
+                    } else {
+                        matrix[pad.name, secondPad.name] = true
+                    }
                 }
+                progress.completedUnitCount++
             }
+            //progress.completedUnitCount += Int64(net.pads.count)
+            //println("\(progress.completedUnitCount) of \(computationLength)")
         }
         
-        return matrix.description()
+        return matrix
     }
 }

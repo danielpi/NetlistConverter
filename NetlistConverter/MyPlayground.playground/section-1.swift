@@ -249,7 +249,7 @@ class Netlist {
     }
     func exportConnectionMatrix2() -> String {
         let sortedPads = sort(pads) { $0.name < $1.name }
-        var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: sortedPads, colHeaders: sortedPads)
+        //var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: sortedPads, colHeaders: sortedPads)
         return "blah"
     }
 }
@@ -337,6 +337,11 @@ let stdDevlon = 9.89285349017e-6
 oneDegreeLat * stdDevLat
 oneDegreeLon * stdDevlon
 
+
+let f = [true,false,false,true]
+f
+f[2]
+f[2..4]
 
 
 

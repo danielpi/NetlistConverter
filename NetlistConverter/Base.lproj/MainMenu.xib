@@ -13,6 +13,8 @@
         <customObject id="-3" userLabel="Application"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="NetlistConverter" customModuleProvider="target">
             <connections>
+                <outlet property="cancelButton" destination="1RC-lm-zOW" id="jnP-L1-GZL"/>
+                <outlet property="progressIndicator" destination="jr7-WA-zZF" id="wJB-8c-XmT"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -669,14 +671,14 @@
         <window title="NetlistConverter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="480" height="163"/>
+            <rect key="contentRect" x="335" y="390" width="157" height="158"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="480" height="163"/>
+                <rect key="frame" x="0.0" y="0.0" width="157" height="158"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9ce-lD-yeT">
-                        <rect key="frame" x="183" y="91" width="115" height="32"/>
+                        <rect key="frame" x="14" y="110" width="129" height="32"/>
                         <buttonCell key="cell" type="push" title="Load Netlist" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="N0V-47-eBU">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -686,7 +688,7 @@
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gzE-gB-Ggn">
-                        <rect key="frame" x="176" y="36" width="129" height="32"/>
+                        <rect key="frame" x="14" y="77" width="129" height="32"/>
                         <buttonCell key="cell" type="push" title="Output Matrix" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="x1X-AV-JLh">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -695,9 +697,22 @@
                             <action selector="exportMatrix:" target="Voe-Tx-rLC" id="q81-M3-4r5"/>
                         </connections>
                     </button>
+                    <progressIndicator fixedFrame="YES" maxValue="1" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="jr7-WA-zZF">
+                        <rect key="frame" x="20" y="45" width="117" height="20"/>
+                    </progressIndicator>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1RC-lm-zOW">
+                        <rect key="frame" x="20" y="21" width="117" height="17"/>
+                        <buttonCell key="cell" type="inline" title="cancel" bezelStyle="inline" alignment="center" borderStyle="border" id="I14-b7-Nuf">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystemBold"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancelOperation:" target="Voe-Tx-rLC" id="Mv0-za-wzS"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="412" y="309.5"/>
+            <point key="canvasLocation" x="36.5" y="350"/>
         </window>
     </objects>
 </document>
