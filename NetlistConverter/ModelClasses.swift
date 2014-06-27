@@ -8,12 +8,12 @@
 
 import Foundation
 
-struct Pad {
+class Pad {
     let pinNumber: Int?
     let pinName: String?
     let component: Component
     var name: String {
-    var response = component.designator + "-"
+        var response = component.designator + "-"
         if let num = pinNumber {
             response += "\(num)"
         } else {
@@ -25,7 +25,13 @@ struct Pad {
         }
         return response
     }
-    var net: Net?
+    //var net: Net?
+    
+    init(pinNumber: Int?, pinName: String?, component: Component) {
+        self.pinNumber = pinNumber
+        self.pinName = pinName
+        self.component = component
+    }
     
     func description() -> String {
         return self.name
@@ -36,7 +42,7 @@ struct Pad {
     */
 }
 
-struct Component {
+class Component {
     var designator: String
     var footprint: String? = nil
     var value: String? = nil
@@ -45,6 +51,9 @@ struct Component {
     init(designator: String) {
         self.designator = designator
     }
+    /*deinit() {
+        // Somehow we need to get rid of all the pads.
+    }*/
     
     func description() -> String {
         var response = designator
@@ -142,12 +151,6 @@ struct ConnectionMatrix {
             response += "\(label) "
         }
         response += "\n"
-        
-        /*
-
-for (index, element) in enumerate(list) {
-println("Item \(index): \(element)")
-}*/
 
         // Create each row
         for (rowIndex, row) in enumerate(rowHeaders) {
@@ -170,25 +173,37 @@ println("Item \(index): \(element)")
 class Netlist {
     var components: Component[] = []
     var nets: Net[] = []
-    var pads: Pad[] = []
+    var pads: Pad[] {
+    get {
+        var listOfPads: Pad[] = []
+        for component in components {
+            //println("\(component.description()) has \(component.pads.count) pads")
+            for aPad in component.pads {
+                listOfPads += aPad
+            }
+        }
+        return listOfPads
+    }
+    }
     
     init(){}
     init(fromString string: String) {
         var componentBuffer: String? = nil
         var netBuffer: String? = nil
+        
         for character in string {
             switch character {
             case "[":
                 componentBuffer = "["
             case "]":
-                componentBuffer = componentBuffer! + "]"
-                self.createComponent(fromString: componentBuffer!)
+                let componentBufferCopy = componentBuffer! + "]"
+                dispatch_async(dispatch_get_main_queue()) { self.parseComponent(fromString: componentBufferCopy) }
                 componentBuffer = nil
             case "(":
                 netBuffer = "("
             case ")":
-                netBuffer = netBuffer! + "]"
-                self.createNet(fromString: netBuffer!)
+                let netBufferCopy = netBuffer! + ")"
+                dispatch_async(dispatch_get_main_queue()) { self.parseNet(fromString: netBufferCopy) }
                 netBuffer = nil
             default:
                 if componentBuffer {
@@ -200,7 +215,7 @@ class Netlist {
         }
     }
     
-    func createComponent(fromString string: String) {
+    func parseComponent(fromString string: String) {
         let fragments = string.componentsSeparatedByString("\r\n")
         if fragments[0] == "[" {
             var aComponent = Component(designator: fragments[1])
@@ -214,25 +229,47 @@ class Netlist {
         }
     }
     
-    func createNet(fromString string: String) {
+    func parseNet(fromString string: String) {
         let fragments = string.componentsSeparatedByString("\r\n")
+        //println(fragments)
         if fragments[0] == "(" {
             var aNet = Net(name: fragments[1])
-            for padString in fragments[2..fragments.count] {
+            for padString in fragments[2..(fragments.count - 1)] {
                 let sections = padString.componentsSeparatedByString("-")
                 var matchingComponents = self.components.filter { $0.designator == sections[0] }
                 if matchingComponents.count > 0 {
                     var aComponent = matchingComponents[0]
                     let name: String? = (sections[1] == "") ? nil : sections[1]
-                    let aPad = Pad(pinNumber: sections[1].toInt(), pinName: name, component: aComponent, net: aNet)
-                    pads += aPad
+                    let aPad = Pad(pinNumber: sections[1].toInt(), pinName: name, component: aComponent)
+                    //pads += aPad
                     aComponent.pads += aPad
+                    //println("added \(aPad.description()) to \(aComponent.description())")
                     aNet.pads += aPad
+                } else {
+                    println("\(padString) not found in the list of components")
                 }
             }
             self.nets += aNet
         }
     }
+    
+    func net(forPad pad: Pad) -> Net? {
+        // Search through the nets to see if the pad is present
+        return nil
+    }
+    func connect(#pad: Pad, toPad: Pad) {
+        // Find if either pad is a part of a net. 
+        // if one or the other is but not both then add one to the net of the other
+        // if both are in nets combine the two nets
+        // if neither are in nets, create a new net and add them both
+    }
+    func connect(#net: Net, toNet: Net) {
+        // Combine two nets
+    }
+    func connect(#pad: Pad, toNet: Net) {
+        
+    }
+    
     
     func prettyPrint() {
         for component in components {
@@ -243,29 +280,6 @@ class Netlist {
         }
     }
     
-    func exportConnectionMatrix2() -> String {
-        var response: String = ""
-        let sortedPads = sort(pads) { $0.name < $1.name }
-        
-        for pad in sortedPads {
-            response += pad.name + ":"
-            println(pad.description())
-            for secondPad in sortedPads {
-                if let net = pad.net {
-                    let matchingPads = net.pads.filter { $0.name == secondPad.name }
-                    if matchingPads.count > 0 {
-                        response += " 1"
-                    } else {
-                        response += " 0"
-                    }
-                } else {
-                    response += " 0"
-                }
-            }
-            response += "\n"
-        }
-        return response
-    }
     func exportConnectionMatrix() -> String {
         let sortedPads = sort(pads) { $0.name < $1.name }
         let padLabels: String[] = sortedPads.map { $0.name }
@@ -283,14 +297,3 @@ class Netlist {
         return matrix.description()
     }
 }
-/*
-let strings = numbers.map {
-    (var number) -> String in
-    var output = ""
-    while number > 0 {
-        output = digitNames[number % 10]! + output
-        number /= 10
-    }
-    return output
-}
-*/
