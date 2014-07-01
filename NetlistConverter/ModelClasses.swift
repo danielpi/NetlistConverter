@@ -91,20 +91,39 @@ class Net {
 
 
 class ConnectionMatrix {
-    let rowHeaders: String[]
-    let colHeaders: String[]
+    var rowHeaders: String[] {
+        var orderedRowHeaders: String[] = Array(count:rowHeaderDictionary.count, repeatedValue: "")
+        for (key, value) in rowHeaderDictionary {
+            orderedRowHeaders[value] = key
+        }
+        return orderedRowHeaders
+    }
+    var colHeaders: String[] {
+        var orderedColHeaders: String[] = Array(count:colHeaderDictionary.count, repeatedValue: "")
+        for (key, value) in colHeaderDictionary {
+            orderedColHeaders[value] = key
+        }
+        return orderedColHeaders
+    }
+    var rowHeaderDictionary: Dictionary<String, Int> = Dictionary()
+    var colHeaderDictionary: Dictionary<String, Int> = Dictionary()
     var grid: Bool[]
+    
     init(rowHeaders: String[], colHeaders: String[]) {
         let rowSet = NSSet(array: rowHeaders)
         let colSet = NSSet(array: colHeaders)
         assert(rowHeaders.count == rowSet.count, "There are duplicate labels in the Row Headers")
         assert(colHeaders.count == colSet.count, "There are duplicate labels in the Column Headers")
         
-        self.rowHeaders = rowHeaders
-        self.colHeaders = colHeaders
-        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+        for (index, row) in enumerate(rowHeaders) {
+            self.rowHeaderDictionary[row] = index
+        }
+        for (index, col) in enumerate(colHeaders) {
+            self.colHeaderDictionary[col] = index
+        }
+        grid = Array(count:self.rowHeaderDictionary.count * self.colHeaderDictionary.count, repeatedValue: false)
     }
-    init(nets: Net[]) {
+    convenience init(nets: Net[]) {
         var headers: NSMutableSet = NSMutableSet()
         for net in nets {
             for pad in net.pads {
@@ -113,9 +132,7 @@ class ConnectionMatrix {
         }
         let padLabels: String[] = headers.allObjects as String[]
         let sortedLabels = sort(padLabels)
-        self.rowHeaders = sortedLabels
-        self.colHeaders = sortedLabels
-        grid = Array(count:self.rowHeaders.count * self.colHeaders.count, repeatedValue: false)
+        self.init(rowHeaders: sortedLabels, colHeaders: sortedLabels)
         
         for net in nets {
             println(net.name)
@@ -128,47 +145,36 @@ class ConnectionMatrix {
     }
     
     func indexIsValidForRow(row: Int, column: Int) -> Bool {
-        return row >= 0 && row < rowHeaders.count && column >= 0 && column < colHeaders.count
+        return row >= 0 && row < rowHeaderDictionary.count && column >= 0 && column < colHeaderDictionary.count
     }
-    func indexFor(label: String, inHeader header: String[]) -> Int {
-        var index: Int = 0
-        if let ind = find(header, label) {
-            index = ind
-        } else {
-            assert(false, "No row with that label")
-        }
-        return index
-    }
-    func indexFor(#rowLabel: String) -> Int { return self.indexFor(rowLabel, inHeader: rowHeaders) }
-    func indexFor(#colLabel: String) -> Int { return self.indexFor(colLabel, inHeader: colHeaders) }
-    
+
     subscript(rowLabel: String, colLabel: String) -> Bool {
         get {
-            let row = indexFor(rowLabel: rowLabel)
-            let column = indexFor(colLabel: colLabel)
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            return grid[(row * colHeaders.count) + column]
+            let row = rowHeaderDictionary[rowLabel]
+            let column = colHeaderDictionary[colLabel]
+            assert(indexIsValidForRow(row!, column: column!), "Index out of range")
+            return grid[(row! * colHeaderDictionary.count) + column!]
         }
         set {
-            let row = indexFor(rowLabel: rowLabel)
-            let column = indexFor(colLabel: colLabel)
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            grid[(row * colHeaders.count) + column] = newValue
+            let row = rowHeaderDictionary[rowLabel]
+            let column = colHeaderDictionary[colLabel]
+            assert(indexIsValidForRow(row!, column: column!), "Index out of range")
+            grid[(row! * colHeaderDictionary.count) + column!] = newValue
         }
     }
     subscript(row: Int, column: Int) -> Bool {
         get {
             assert(indexIsValidForRow(row, column: column), "Index out of range")
-            return grid[(row * colHeaders.count) + column]
+            return grid[(row * colHeaderDictionary.count) + column]
         }
         set {
             assert(indexIsValidForRow(row, column: column), "Index out of range")
-            grid[(row * colHeaders.count) + column] = newValue
+            grid[(row * colHeaderDictionary.count) + column] = newValue
         }
     }
     
     func description() -> String {
-        var computationLength: Int64 = Int64(rowHeaders.count * colHeaders.count)
+        var computationLength: Int64 = Int64(rowHeaderDictionary.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
         // Create the column header
@@ -177,18 +183,17 @@ class ConnectionMatrix {
             response += "\(label) "
         }
         response += "\n"
-
+        
         // Create each row
         for (rowIndex, row) in enumerate(rowHeaders) {
             response += "\(row):\t"
             for (colIndex, col) in enumerate(colHeaders) {
                 let status = self[rowIndex, colIndex] ? 1 : 0
                 response += "\(status) "
-                progress.completedUnitCount++
             }
             response += "\n"
+            progress.completedUnitCount++
         }
-        
         return response
     }
     func prettyPrint() {
