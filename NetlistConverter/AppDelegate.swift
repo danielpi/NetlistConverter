@@ -90,8 +90,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func cancelOperation(sender : AnyObject) {
     }
     
-    
-    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: NSDictionary!, context: CMutableVoidPointer) {
+    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
         //println("Observed Something")
         NSOperationQueue.mainQueue().addOperationWithBlock( {
                 let progress = object as NSProgress

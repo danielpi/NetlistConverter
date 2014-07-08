@@ -47,7 +47,7 @@ class Component {
     var designator: String
     var footprint: String? = nil
     var value: String? = nil
-    var pads: Pad[] = []
+    var pads: [Pad] = []
     
     init(designator: String) {
         self.designator = designator
@@ -74,7 +74,7 @@ class Component {
 
 class Net {
     var name: String
-    var pads: Pad[] = []
+    var pads: [Pad] = []
     
     init(name: String) {
         self.name = name
@@ -91,15 +91,15 @@ class Net {
 
 
 class ConnectionMatrix {
-    var rowHeaders: String[] {
-        var orderedRowHeaders: String[] = Array(count:rowHeaderDictionary.count, repeatedValue: "")
+    var rowHeaders: [String] {
+        var orderedRowHeaders: [String] = Array(count:rowHeaderDictionary.count, repeatedValue: "")
         for (key, value) in rowHeaderDictionary {
             orderedRowHeaders[value] = key
         }
         return orderedRowHeaders
     }
-    var colHeaders: String[] {
-        var orderedColHeaders: String[] = Array(count:colHeaderDictionary.count, repeatedValue: "")
+    var colHeaders: [String] {
+        var orderedColHeaders: [String] = Array(count:colHeaderDictionary.count, repeatedValue: "")
         for (key, value) in colHeaderDictionary {
             orderedColHeaders[value] = key
         }
@@ -107,9 +107,9 @@ class ConnectionMatrix {
     }
     var rowHeaderDictionary: Dictionary<String, Int> = Dictionary()
     var colHeaderDictionary: Dictionary<String, Int> = Dictionary()
-    var grid: Bool[]
+    var grid: [Bool]
     
-    init(rowHeaders: String[], colHeaders: String[]) {
+    init(rowHeaders: [String], colHeaders: [String]) {
         let rowSet = NSSet(array: rowHeaders)
         let colSet = NSSet(array: colHeaders)
         assert(rowHeaders.count == rowSet.count, "There are duplicate labels in the Row Headers")
@@ -123,15 +123,15 @@ class ConnectionMatrix {
         }
         grid = Array(count:self.rowHeaderDictionary.count * self.colHeaderDictionary.count, repeatedValue: false)
     }
-    convenience init(nets: Net[]) {
+    convenience init(nets: [Net]) {
         var headers: NSMutableSet = NSMutableSet()
         for net in nets {
             for pad in net.pads {
                 headers.addObject(pad.name)
             }
         }
-        let padLabels: String[] = headers.allObjects as String[]
-        let sortedLabels = sort(padLabels)
+        let padLabels: [String] = headers.allObjects as [String]
+        let sortedLabels = sorted(padLabels)
         self.init(rowHeaders: sortedLabels, colHeaders: sortedLabels)
         
         for net in nets {
@@ -203,11 +203,11 @@ class ConnectionMatrix {
 
 
 class Netlist {
-    var components: Component[] = []
-    var nets: Net[] = []
-    var pads: Pad[] {
+    var components: [Component] = []
+    var nets: [Net] = []
+    var pads: [Pad] {
     get {
-        var listOfPads: Pad[] = []
+        var listOfPads: [Pad] = []
         for component in components {
             //println("\(component.description()) has \(component.pads.count) pads")
             for aPad in component.pads {
@@ -266,7 +266,7 @@ class Netlist {
         //println(fragments)
         if fragments[0] == "(" {
             var aNet = Net(name: fragments[1])
-            for padString in fragments[2..(fragments.count - 1)] {
+            for padString in fragments[2..<(fragments.count - 1)] {
                 let sections = padString.componentsSeparatedByString("-")
                 var matchingComponents = self.components.filter { $0.designator == sections[0] }
                 if matchingComponents.count > 0 {
@@ -315,8 +315,8 @@ class Netlist {
     // Should this be a calculated property???
     func exportConnectionMatrix() -> ConnectionMatrix {
         //let matrix: ConnectionMatrix = ConnectionMatrix(nets: nets)
-        let sortedPads = sort(pads) { $0.name < $1.name }
-        let padLabels: String[] = sortedPads.map { $0.name }
+        let sortedPads = sorted(pads){ $0.name < $1.name }
+        let padLabels: [String] = sortedPads.map { $0.name }
         var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
         var computationLength: Int64 = Int64(pads.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
