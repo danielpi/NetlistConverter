@@ -173,6 +173,24 @@ class ConnectionMatrix {
         }
     }
     
+    func connectNet(aNet: Net) {
+        var connectionRow: [Bool] = Array(count: self.colHeaderDictionary.count, repeatedValue: false)
+        for pad in aNet.pads {
+            if let column = colHeaderDictionary[pad.name] {
+                connectionRow[column] = true
+            }
+        }
+        for pad in aNet.pads {
+            if let row = rowHeaderDictionary[pad.name] {
+                let startIndex: Int = row * colHeaderDictionary.count
+                let finishIndex: Int = (row + 1) * colHeaderDictionary.count
+                let aRange: Range = Range(start: startIndex, end: finishIndex)
+                grid.replaceRange(aRange, with: connectionRow)
+                //grid[subRange: aRange] = connectionRow
+            }
+        }
+    }
+    
     func description() -> String {
         var computationLength: Int64 = Int64(rowHeaderDictionary.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
@@ -188,8 +206,9 @@ class ConnectionMatrix {
         for (rowIndex, row) in enumerate(rowHeaders) {
             response += "\(row):\t"
             for (colIndex, col) in enumerate(colHeaders) {
-                let status = self[rowIndex, colIndex] ? 1 : 0
-                response += "\(status) "
+                //let status = self[rowIndex, colIndex] ? 1 : 0
+                //response += "\(status) "
+                response += self[rowIndex, colIndex] ? "1 " : "0 "
             }
             response += "\n"
             progress.completedUnitCount++
@@ -318,12 +337,12 @@ class Netlist {
         let sortedPads = sorted(pads){ $0.name < $1.name }
         let padLabels: [String] = sortedPads.map { $0.name }
         var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
-        var computationLength: Int64 = Int64(pads.count)
+        var computationLength: Int64 = Int64(self.nets.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
-        
+        /*
         netLoop: for net in self.nets {
-            println(net.name)
+            print(net.name + " ")
             for pad in net.pads {
                 for secondPad in net.pads {
                     if progress.cancelled {
@@ -336,6 +355,16 @@ class Netlist {
             }
             //progress.completedUnitCount += Int64(net.pads.count)
             //println("\(progress.completedUnitCount) of \(computationLength)")
+        }
+        */
+        netLoop: for net in self.nets {
+            print(net.name + " ")
+            if progress.cancelled {
+                break //netLoop
+            } else {
+                matrix.connectNet(net)
+            }
+            progress.completedUnitCount++
         }
         
         return matrix

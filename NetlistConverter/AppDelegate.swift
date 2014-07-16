@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         progress.resignCurrent()
                         progress.becomeCurrentWithPendingUnitCount(1)
                         let output = connectionMatrix.description()
-                        print(output)
+                        //print(output)
                         output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
                         progress.resignCurrent()
                     }

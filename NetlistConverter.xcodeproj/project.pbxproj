@@ -11,8 +11,13 @@
 		E6331CD319591CD100BB8BCD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6331CD219591CD100BB8BCD /* AppDelegate.swift */; };
 		E6331CD519591CD100BB8BCD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6331CD419591CD100BB8BCD /* Images.xcassets */; };
 		E6331CD819591CD100BB8BCD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E6331CD619591CD100BB8BCD /* MainMenu.xib */; };
-		E6331CE419591CD100BB8BCD /* NetlistConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6331CE319591CD100BB8BCD /* NetlistConverterTests.swift */; };
 		E6331CEE1959266F00BB8BCD /* ModelClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6331CED1959266F00BB8BCD /* ModelClasses.swift */; };
+		E6E54E781975E8F600F2FA6B /* EI-360.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E771975E8F600F2FA6B /* EI-360.NET */; };
+		E6E54E7B1975EB4300F2FA6B /* NetlistConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E54E7A1975EB4300F2FA6B /* NetlistConverterTests.swift */; };
+		E6E54E831975EF0100F2FA6B /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E821975EF0100F2FA6B /* Info.plist */; };
+		E6E54E871975F48500F2FA6B /* EI-385 Main.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E841975F48500F2FA6B /* EI-385 Main.NET */; };
+		E6E54E881975F48500F2FA6B /* EI-387 Main.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E851975F48500F2FA6B /* EI-387 Main.NET */; };
+		E6E54E891975F48500F2FA6B /* EI-411 Project.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E861975F48500F2FA6B /* EI-411 Project.NET */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,10 +38,15 @@
 		E6331CD419591CD100BB8BCD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E6331CD719591CD100BB8BCD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		E6331CDD19591CD100BB8BCD /* NetlistConverterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetlistConverterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6331CE219591CD100BB8BCD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E6331CE319591CD100BB8BCD /* NetlistConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetlistConverterTests.swift; sourceTree = "<group>"; };
 		E6331CED1959266F00BB8BCD /* ModelClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelClasses.swift; sourceTree = "<group>"; };
 		E6331CEF1959296300BB8BCD /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
+		E6E54E771975E8F600F2FA6B /* EI-360.NET */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "EI-360.NET"; sourceTree = "<group>"; };
+		E6E54E791975EB4300F2FA6B /* NetlistConverterTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NetlistConverterTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		E6E54E7A1975EB4300F2FA6B /* NetlistConverterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetlistConverterTests.swift; sourceTree = "<group>"; };
+		E6E54E821975EF0100F2FA6B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E6E54E841975F48500F2FA6B /* EI-385 Main.NET */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "EI-385 Main.NET"; sourceTree = "<group>"; };
+		E6E54E851975F48500F2FA6B /* EI-387 Main.NET */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "EI-387 Main.NET"; sourceTree = "<group>"; };
+		E6E54E861975F48500F2FA6B /* EI-411 Project.NET */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "EI-411 Project.NET"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,7 +110,13 @@
 		E6331CE019591CD100BB8BCD /* NetlistConverterTests */ = {
 			isa = PBXGroup;
 			children = (
-				E6331CE319591CD100BB8BCD /* NetlistConverterTests.swift */,
+				E6E54E841975F48500F2FA6B /* EI-385 Main.NET */,
+				E6E54E851975F48500F2FA6B /* EI-387 Main.NET */,
+				E6E54E861975F48500F2FA6B /* EI-411 Project.NET */,
+				E6E54E771975E8F600F2FA6B /* EI-360.NET */,
+				E6E54E7A1975EB4300F2FA6B /* NetlistConverterTests.swift */,
+				E6E54E791975EB4300F2FA6B /* NetlistConverterTests-Bridging-Header.h */,
+				E6E54E821975EF0100F2FA6B /* Info.plist */,
 				E6331CE119591CD100BB8BCD /* Supporting Files */,
 			);
 			path = NetlistConverterTests;
@@ -109,7 +125,6 @@
 		E6331CE119591CD100BB8BCD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E6331CE219591CD100BB8BCD /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -203,6 +218,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6E54E871975F48500F2FA6B /* EI-385 Main.NET in Resources */,
+				E6E54E831975EF0100F2FA6B /* Info.plist in Resources */,
+				E6E54E881975F48500F2FA6B /* EI-387 Main.NET in Resources */,
+				E6E54E781975E8F600F2FA6B /* EI-360.NET in Resources */,
+				E6E54E891975F48500F2FA6B /* EI-411 Project.NET in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,7 +243,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6331CE419591CD100BB8BCD /* NetlistConverterTests.swift in Sources */,
+				E6E54E7B1975EB4300F2FA6B /* NetlistConverterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +373,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/NetlistConverter.app/Contents/MacOS/NetlistConverter";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -366,6 +387,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "NetlistConverterTests/NetlistConverterTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Debug;
@@ -374,6 +397,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/NetlistConverter.app/Contents/MacOS/NetlistConverter";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -383,6 +407,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "NetlistConverterTests/NetlistConverterTests-Bridging-Header.h";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Release;
