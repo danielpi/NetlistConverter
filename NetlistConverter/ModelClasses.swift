@@ -9,24 +9,26 @@
 import Foundation
 import Cocoa
 
-class Pad {
+class Pad: Printable {
     let pinNumber: Int?
     let pinName: String?
     let component: Component
     var name: String {
-        var response = component.designator + "-"
-        if let num = pinNumber {
-            response += "\(num)"
+    var response = component.designator + "-"
+    if let num = pinNumber {
+        response += "\(num)"
+    } else {
+        if let nam = pinName {
+            response += nam
         } else {
-            if let nam = pinName {
-                response += nam
-            } else {
-                response += "?"
-            }
+            response += "?"
         }
-        return response
     }
-    //var net: Net?
+    return response
+    }
+    var description: String {
+    return self.name
+    }
     
     init(pinNumber: Int?, pinName: String?, component: Component) {
         self.pinNumber = pinNumber
@@ -34,9 +36,6 @@ class Pad {
         self.component = component
     }
     
-    func description() -> String {
-        return self.name
-    }
     /*
     - I don't have a reliable way of referring to pads that are not named or numbered.
     - Should the pad have a reference to its net? This makes for a bit of a circular reference that needs to be kept in sync.
@@ -90,7 +89,7 @@ class Net {
 }
 
 
-class ConnectionMatrix {
+public class ConnectionMatrix {
     var rowHeaders: [String] {
         var orderedRowHeaders: [String] = Array(count:rowHeaderDictionary.count, repeatedValue: "")
         for (key, value) in rowHeaderDictionary {
@@ -221,7 +220,7 @@ class ConnectionMatrix {
 }
 
 
-class Netlist {
+public class Netlist {
     var components: [Component] = []
     var nets: [Net] = []
     var pads: [Pad] {
@@ -237,8 +236,8 @@ class Netlist {
     }
     }
     
-    init(){}
-    init(fromString string: String) {
+    public init(){}
+    public init(fromString string: String) {
         var componentBuffer: String? = nil
         var netBuffer: String? = nil
         
@@ -332,7 +331,7 @@ class Netlist {
     }
     
     // Should this be a calculated property???
-    func exportConnectionMatrix() -> ConnectionMatrix {
+    public func exportConnectionMatrix() -> ConnectionMatrix {
         //let matrix: ConnectionMatrix = ConnectionMatrix(nets: nets)
         let sortedPads = sorted(pads){ $0.name < $1.name }
         let padLabels: [String] = sortedPads.map { $0.name }
@@ -340,23 +339,6 @@ class Netlist {
         var computationLength: Int64 = Int64(self.nets.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
-        /*
-        netLoop: for net in self.nets {
-            print(net.name + " ")
-            for pad in net.pads {
-                for secondPad in net.pads {
-                    if progress.cancelled {
-                        break //netLoop
-                    } else {
-                        matrix[pad.name, secondPad.name] = true
-                    }
-                }
-                progress.completedUnitCount++
-            }
-            //progress.completedUnitCount += Int64(net.pads.count)
-            //println("\(progress.completedUnitCount) of \(computationLength)")
-        }
-        */
         netLoop: for net in self.nets {
             print(net.name + " ")
             if progress.cancelled {

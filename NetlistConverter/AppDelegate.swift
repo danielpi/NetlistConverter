@@ -11,10 +11,10 @@ import Cocoa
 
 class AppDelegate: NSObject, NSApplicationDelegate {
                             
-    @IBOutlet var window: NSWindow
+    @IBOutlet var window: NSWindow!
     var netlist: Netlist? = nil
-    @IBOutlet var progressIndicator : NSProgressIndicator
-    @IBOutlet var cancelButton : NSButton
+    @IBOutlet var progressIndicator : NSProgressIndicator!
+    @IBOutlet var cancelButton : NSButton!
 
 
     func applicationDidFinishLaunching(aNotification: NSNotification?) {
