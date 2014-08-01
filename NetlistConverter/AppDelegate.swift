@@ -91,10 +91,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
-        //println("Observed Something")
         NSOperationQueue.mainQueue().addOperationWithBlock( {
                 let progress = object as NSProgress
-                self.progressIndicator.doubleValue = progress.fractionCompleted
+                self.progressIndicator.doubleValue = ceil(progress.fractionCompleted * 100.0) / 100.0
                 //println("\(progress.fractionCompleted)")
             } )
     }

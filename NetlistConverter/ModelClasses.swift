@@ -346,9 +346,9 @@ public class Netlist {
             } else {
                 matrix.connectNet(net)
             }
-            progress.completedUnitCount++
+            ++progress.completedUnitCount
         }
-        
+        //println("exportConnectionMatrix complete: \(progress.fractionCompleted)")
         return matrix
     }
 }
