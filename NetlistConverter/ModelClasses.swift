@@ -229,7 +229,7 @@ public class Netlist {
         for component in components {
             //println("\(component.description()) has \(component.pads.count) pads")
             for aPad in component.pads {
-                listOfPads += aPad
+                listOfPads += [aPad]
             }
         }
         return listOfPads
@@ -256,9 +256,9 @@ public class Netlist {
                 dispatch_async(dispatch_get_main_queue()) { self.parseNet(fromString: netBufferCopy) }
                 netBuffer = nil
             default:
-                if componentBuffer {
+                if (componentBuffer != nil) {
                     componentBuffer = componentBuffer! + character
-                } else if netBuffer {
+                } else if (netBuffer != nil) {
                     netBuffer = netBuffer! + character
                 }
             }
@@ -275,7 +275,7 @@ public class Netlist {
             if countElements(fragments[3]) > 0 {
                 aComponent.value = fragments[3]
             }
-            self.components += aComponent
+            self.components += [aComponent]
         }
     }
     
@@ -292,14 +292,14 @@ public class Netlist {
                     let name: String? = (sections[1] == "") ? nil : sections[1]
                     let aPad = Pad(pinNumber: sections[1].toInt(), pinName: name, component: aComponent)
                     //pads += aPad
-                    aComponent.pads += aPad
+                    aComponent.pads += [aPad]
                     //println("added \(aPad.description()) to \(aComponent.description())")
-                    aNet.pads += aPad
+                    aNet.pads += [aPad]
                 } else {
                     println("\(padString) not found in the list of components")
                 }
             }
-            self.nets += aNet
+            self.nets += [aNet]
         }
     }
     

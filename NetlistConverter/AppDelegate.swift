@@ -90,7 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func cancelOperation(sender : AnyObject) {
     }
     
-    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
+    //override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
+    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafeMutablePointer<()>) {
         NSOperationQueue.mainQueue().addOperationWithBlock( {
                 let progress = object as NSProgress
                 self.progressIndicator.doubleValue = ceil(progress.fractionCompleted * 100.0) / 100.0
