@@ -257,9 +257,9 @@ public class Netlist {
                 netBuffer = nil
             default:
                 if (componentBuffer != nil) {
-                    componentBuffer = componentBuffer! + character
+                    componentBuffer!.append(character)
                 } else if (netBuffer != nil) {
-                    netBuffer = netBuffer! + character
+                    netBuffer!.append(character)
                 }
             }
         }

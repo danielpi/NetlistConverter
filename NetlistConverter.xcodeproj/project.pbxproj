@@ -422,7 +422,7 @@
 				E6331CE619591CD100BB8BCD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		E6331CE719591CD100BB8BCD /* Build configuration list for PBXNativeTarget "NetlistConverter" */ = {
 			isa = XCConfigurationList;
@@ -431,7 +431,7 @@
 				E6331CE919591CD100BB8BCD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		E6331CEA19591CD100BB8BCD /* Build configuration list for PBXNativeTarget "NetlistConverterTests" */ = {
 			isa = XCConfigurationList;
@@ -440,7 +440,7 @@
 				E6331CEC19591CD100BB8BCD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
