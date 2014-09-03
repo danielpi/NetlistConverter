@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Electronic Innovations. All rights reserved.
 //
 
-import Cocoa
+//import Cocoa
 import XCTest
 import NetlistConverter
 
@@ -26,9 +26,13 @@ class NetlistConverterTests: XCTestCase {
         //println("fileName \(fileName)")
         let testDataPath = testBundle.pathForResource(fileName, ofType:"NET")
         //println(testDataPath)
-        let testDataURL = NSURL(fileURLWithPath: testDataPath, isDirectory: false)
-        let fileContents = String.stringWithContentsOfURL(testDataURL, encoding: NSUTF8StringEncoding, error: nil)
-        return fileContents
+        if let validTestDataPath = testDataPath {
+            let testDataURL = NSURL(fileURLWithPath: validTestDataPath, isDirectory: false)
+            let fileContents = String.stringWithContentsOfURL(testDataURL, encoding: NSUTF8StringEncoding, error: nil)
+            return fileContents
+        } else {
+            return nil
+        }
     }
     
 
