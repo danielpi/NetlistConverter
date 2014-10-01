@@ -14,7 +14,6 @@
 		E6331CEE1959266F00BB8BCD /* ModelClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6331CED1959266F00BB8BCD /* ModelClasses.swift */; };
 		E6E54E781975E8F600F2FA6B /* EI-360.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E771975E8F600F2FA6B /* EI-360.NET */; };
 		E6E54E7B1975EB4300F2FA6B /* NetlistConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E54E7A1975EB4300F2FA6B /* NetlistConverterTests.swift */; };
-		E6E54E831975EF0100F2FA6B /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E821975EF0100F2FA6B /* Info.plist */; };
 		E6E54E871975F48500F2FA6B /* EI-385 Main.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E841975F48500F2FA6B /* EI-385 Main.NET */; };
 		E6E54E881975F48500F2FA6B /* EI-387 Main.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E851975F48500F2FA6B /* EI-387 Main.NET */; };
 		E6E54E891975F48500F2FA6B /* EI-411 Project.NET in Resources */ = {isa = PBXBuildFile; fileRef = E6E54E861975F48500F2FA6B /* EI-411 Project.NET */; };
@@ -173,7 +172,7 @@
 		E6331CC319591CD100BB8BCD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Electronic Innovations";
 				TargetAttributes = {
 					E6331CCA19591CD100BB8BCD = {
@@ -219,7 +218,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6E54E871975F48500F2FA6B /* EI-385 Main.NET in Resources */,
-				E6E54E831975EF0100F2FA6B /* Info.plist in Resources */,
 				E6E54E881975F48500F2FA6B /* EI-387 Main.NET in Resources */,
 				E6E54E781975E8F600F2FA6B /* EI-360.NET in Resources */,
 				E6E54E891975F48500F2FA6B /* EI-411 Project.NET in Resources */,

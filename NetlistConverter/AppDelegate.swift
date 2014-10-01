@@ -38,7 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             if result == NSFileHandlingPanelOKButton {
                 let urls = panel.URLs as NSArray
                 let url = urls.firstObject as NSURL
-                let fileContents = String.stringWithContentsOfURL(url, encoding: NSUTF8StringEncoding, error: nil)
+                let fileContents = NSString(contentsOfURL: url, encoding: NSUTF8StringEncoding, error: nil)
                 if let contents = fileContents {
                     let fileNetlist = Netlist(fromString: contents)
                     self.netlist = fileNetlist
@@ -58,28 +58,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         panel.allowedFileTypes = ["txt"]
         panel.message = "Where do you want to save the connection matrix to?"
         panel.nameFieldStringValue = "ConnectionMatrix"
-        let completionBlock: (Int) -> Void = {
-            result in
+        let completionBlock: (Int) -> Void = { result in
             if result == NSFileHandlingPanelOKButton {
-                let url = panel.URL
-                if let theNetList = self.netlist {
-                    // Set up a progress object
-                    self.progressIndicator.hidden = false
-                    let progress = NSProgress(totalUnitCount: 2)
-                    let options : NSKeyValueObservingOptions = .New | .Old | .Initial | .Prior
-                    progress.addObserver(self, forKeyPath: "fractionCompleted", options: options, context: nil)
-                    
-                    let queue: dispatch_queue_t = dispatch_queue_create("My Queue", DISPATCH_QUEUE_SERIAL)
-                    
-                    dispatch_async(queue) {
-                        progress.becomeCurrentWithPendingUnitCount(1)
-                        let connectionMatrix = theNetList.exportConnectionMatrix()
-                        progress.resignCurrent()
-                        progress.becomeCurrentWithPendingUnitCount(1)
-                        let output = connectionMatrix.description()
-                        //print(output)
-                        output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
-                        progress.resignCurrent()
+                if let url = panel.URL {
+                    if let theNetList = self.netlist {
+                        // Set up a progress object
+                        self.progressIndicator.hidden = false
+                        let progress = NSProgress(totalUnitCount: 2)
+                        let options : NSKeyValueObservingOptions = .New | .Old | .Initial | .Prior
+                        progress.addObserver(self, forKeyPath: "fractionCompleted", options: options, context: nil)
+                        
+                        let queue: dispatch_queue_t = dispatch_queue_create("My Queue", DISPATCH_QUEUE_SERIAL)
+                        
+                        dispatch_async(queue) {
+                            progress.becomeCurrentWithPendingUnitCount(1)
+                            let connectionMatrix = theNetList.exportConnectionMatrix()
+                            progress.resignCurrent()
+                            progress.becomeCurrentWithPendingUnitCount(1)
+                            let output = connectionMatrix.description()
+                            //print(output)
+                            output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
+                            progress.resignCurrent()
+                        }
                     }
                 }
             }
@@ -91,7 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     //override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
-    override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafeMutablePointer<()>) {
+    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<()>) {
         NSOperationQueue.mainQueue().addOperationWithBlock( {
                 let progress = object as NSProgress
                 self.progressIndicator.doubleValue = ceil(progress.fractionCompleted * 100.0) / 100.0
