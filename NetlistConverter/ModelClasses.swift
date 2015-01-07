@@ -14,20 +14,20 @@ class Pad: Printable {
     let pinName: String?
     let component: Component
     var name: String {
-    var response = component.designator + "-"
-    if let num = pinNumber {
-        response += "\(num)"
-    } else {
-        if let nam = pinName {
-            response += nam
+        var response = component.designator + "-"
+        if let num = pinNumber {
+            response += "\(num)"
         } else {
-            response += "?"
+            if let nam = pinName {
+                response += nam
+            } else {
+                response += "?"
+            }
         }
-    }
-    return response
+        return response
     }
     var description: String {
-    return self.name
+        return self.name
     }
     
     init(pinNumber: Int?, pinName: String?, component: Component) {
@@ -224,16 +224,16 @@ public class Netlist {
     var components: [Component] = []
     var nets: [Net] = []
     var pads: [Pad] {
-    get {
-        var listOfPads: [Pad] = []
-        for component in components {
-            //println("\(component.description()) has \(component.pads.count) pads")
-            for aPad in component.pads {
-                listOfPads += [aPad]
+        get {
+            var listOfPads: [Pad] = []
+            for component in components {
+                //println("\(component.description()) has \(component.pads.count) pads")
+                for aPad in component.pads {
+                    listOfPads += [aPad]
+                }
             }
+            return listOfPads
         }
-        return listOfPads
-    }
     }
     
     public init(){}
@@ -264,7 +264,20 @@ public class Netlist {
             }
         }
     }
+    /*
+    An example Component definition.
     
+    [
+    ZD2
+    0805A DIODE
+    3V9
+    
+    
+    
+    ]
+    
+    First entry is the name. Second is the footprint and third is the value.
+    */
     func parseComponent(fromString string: String) {
         let fragments = string.componentsSeparatedByString("\r\n")
         if fragments[0] == "[" {
@@ -279,6 +292,18 @@ public class Netlist {
         }
     }
     
+    /*
+    An example Net definition.
+    
+    (
+    NetC24_2
+    C24-2
+    R13-2
+    R14-2
+    )
+    
+    First entry is the name. The rest are the names of the pins that are a part of the net.
+    */
     func parseNet(fromString string: String) {
         let fragments = string.componentsSeparatedByString("\r\n")
         //println(fragments)
