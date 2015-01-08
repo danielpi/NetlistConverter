@@ -328,6 +328,14 @@ public class Netlist {
         }
     }
     
+    /*
+    An example of a REPNL
+    
+    		1	2	3							% ####
+    
+    Each row is a net. There are no net names (Create our own). Each number is a pad name (There are no components).
+    */
+    
     func net(forPad pad: Pad) -> Net? {
         // Search through the nets to see if the pad is present
         return nil

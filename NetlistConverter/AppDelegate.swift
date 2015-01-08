@@ -31,7 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
         panel.message = "Select a Netlist file"
-        panel.allowedFileTypes = ["net", "NET"]
+        panel.allowedFileTypes = ["net", "NET", "repnl", "REPNL"]
         
         let completionBlock: (Int) -> Void = {
             result in
@@ -40,9 +40,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let url = urls.firstObject as NSURL
                 let fileContents = NSString(contentsOfURL: url, encoding: NSUTF8StringEncoding, error: nil)
                 if let contents = fileContents {
-                    let fileNetlist = Netlist(fromString: contents)
-                    self.netlist = fileNetlist
-                    fileNetlist.prettyPrint()
+                    
+                    switch url.pathExtension {
+                    case "net", "NET":
+                        let fileNetlist = Netlist(fromString: contents)
+                        self.netlist = Netlist(fromString: contents)
+                        fileNetlist.prettyPrint()
+                    case "repnl", "REPNL":
+                        let fileNetlist = Netlist(fromString: contents)
+                        self.netlist = fileNetlist
+                        fileNetlist.prettyPrint()
+                    default:
+                        println("Tried to use a txt file")
+                    }
+                    
                 } else {
                     
                 }
