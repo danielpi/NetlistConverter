@@ -22,13 +22,13 @@ class NetlistConverterTests: XCTestCase {
     }
     
     func loadNetlistToString(fileName: String) -> String? {
-        let testBundle = NSBundle(forClass: NetlistConverterTests.classForKeyedArchiver())
+        let testBundle = NSBundle(forClass: NetlistConverterTests.classForKeyedArchiver()!)
         //println("fileName \(fileName)")
         let testDataPath = testBundle.pathForResource(fileName, ofType:"NET")
         //println(testDataPath)
         if let validTestDataPath = testDataPath {
             let testDataURL = NSURL(fileURLWithPath: validTestDataPath, isDirectory: false)
-            let fileContents = String.stringWithContentsOfURL(testDataURL, encoding: NSUTF8StringEncoding, error: nil)
+            let fileContents = NSString(contentsOfURL: testDataURL!, encoding: NSUTF8StringEncoding, error: nil)
             return fileContents
         } else {
             return nil
@@ -77,5 +77,16 @@ class NetlistConverterTests: XCTestCase {
         performanceOfConversionMatrixCreationForFileNamed("EI-360")
     }
 
-
+    func testREPNL() {
+        let testBundle = NSBundle(forClass: NetlistConverterTests.classForKeyedArchiver()!)
+        let testDataPath = testBundle.pathForResource("FluroNetlist", ofType:"REPNL")
+        let testDataURL = NSURL(fileURLWithPath: testDataPath!, isDirectory: false)
+        let fileContents: REPNLString = NSString(contentsOfURL: testDataURL!, encoding: NSUTF8StringEncoding, error: nil)!
+        
+        let fileNetlist = Netlist(REPNLFromString: String(fileContents))
+        fileNetlist.prettyPrint()
+    }
 }
+
+public typealias REPNLString = String
+

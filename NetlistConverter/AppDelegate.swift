@@ -15,7 +15,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var netlist: Netlist? = nil
     @IBOutlet var progressIndicator : NSProgressIndicator!
     @IBOutlet var cancelButton : NSButton!
-
+    
+    var numericOrder = false
 
     func applicationDidFinishLaunching(aNotification: NSNotification?) {
         // Insert code here to initialize your application
@@ -43,11 +44,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     
                     switch url.pathExtension {
                     case "net", "NET":
+                        self.numericOrder = false
                         let fileNetlist = Netlist(fromString: contents)
                         self.netlist = Netlist(fromString: contents)
                         fileNetlist.prettyPrint()
                     case "repnl", "REPNL":
-                        let fileNetlist = Netlist(fromString: contents)
+                        self.numericOrder = true
+                        let fileNetlist = Netlist(REPNLFromString: contents)
                         self.netlist = fileNetlist
                         fileNetlist.prettyPrint()
                     default:
@@ -83,10 +86,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         
                         dispatch_async(queue) {
                             progress.becomeCurrentWithPendingUnitCount(1)
-                            let connectionMatrix = theNetList.exportConnectionMatrix()
+                            let connectionMatrix = theNetList.exportConnectionMatrix(self.numericOrder)
                             progress.resignCurrent()
                             progress.becomeCurrentWithPendingUnitCount(1)
-                            let output = connectionMatrix.description()
+                            let output = connectionMatrix.description(!(self.numericOrder))
                             //print(output)
                             output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
                             progress.resignCurrent()

@@ -190,12 +190,15 @@ public class ConnectionMatrix {
         }
     }
     
-    func description() -> String {
+    func description(displayRowHeaders: Bool) -> String {
         var computationLength: Int64 = Int64(rowHeaderDictionary.count)
         var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
         // Create the column header
-        var response = "\t\t"
+        var response = ""
+        if displayRowHeaders {
+            response = "\t\t"
+        }
         for label in colHeaders {
             response += "\(label) "
         }
@@ -203,7 +206,9 @@ public class ConnectionMatrix {
         
         // Create each row
         for (rowIndex, row) in enumerate(rowHeaders) {
-            response += "\(row):\t"
+            if displayRowHeaders {
+                response += "\(row):\t"
+            }
             for (colIndex, col) in enumerate(colHeaders) {
                 //let status = self[rowIndex, colIndex] ? 1 : 0
                 //response += "\(status) "
@@ -215,10 +220,31 @@ public class ConnectionMatrix {
         return response
     }
     func prettyPrint() {
-        print(self.description())
+        print(self.description(true))
     }
 }
 
+
+
+struct Scanner {
+    let scanner : NSScanner
+    
+    init(string: String) {
+        scanner = NSScanner(string: string)
+    }
+    
+    func scanInt() -> Int? {
+        var int : CInt = 0
+        let didScan = scanner.scanInt(&int)
+        return didScan ? Int(int) : nil
+    }
+    
+    func scan(token : String) -> Bool {
+        return scanner.scanString(token, intoString: nil)
+    }
+}
+
+public typealias REPNLString = String
 
 public class Netlist {
     var components: [Component] = []
@@ -263,6 +289,30 @@ public class Netlist {
                 }
             }
         }
+    }
+    public init(REPNLFromString string: REPNLString) {
+        // Split out each line
+        // Each line becomes a new net
+        
+        let netStrings = string.componentsSeparatedByString("\n")
+        for netString in netStrings {
+            println("\(netString)")
+            let aNet = Net(name: "abc")
+            
+            let netScanner = NSScanner(string: netString)
+            var pointNumber: CInt = 0
+            while (netScanner.scanInt(&pointNumber)) {
+                println("\(pointNumber)")
+                let aComponent = Component(designator: "\(pointNumber)")
+                let aPad = Pad(pinNumber: Int(pointNumber), pinName: nil, component: aComponent)
+                aComponent.pads.append(aPad)
+                aNet.pads.append(aPad)
+                self.components.append(aComponent)
+            }
+            self.nets.append(aNet)
+        }
+        // split out each point number (ignore everything after th % character
+            // Each number creates a component and pad that is added to the current net
     }
     /*
     An example Component definition.
@@ -354,7 +404,7 @@ public class Netlist {
     }
     
     
-    func prettyPrint() {
+    public func prettyPrint() {
         for component in components {
             println(component.description())
         }
@@ -364,9 +414,12 @@ public class Netlist {
     }
     
     // Should this be a calculated property???
-    public func exportConnectionMatrix() -> ConnectionMatrix {
+    public func exportConnectionMatrix(numericOrder: Bool) -> ConnectionMatrix {
         //let matrix: ConnectionMatrix = ConnectionMatrix(nets: nets)
-        let sortedPads = sorted(pads){ $0.name < $1.name }
+        var sortedPads = sorted(pads){ $0.name < $1.name }
+        if numericOrder {
+            sortedPads = sorted(pads){ $0.pinNumber! < $1.pinNumber! }
+        }
         let padLabels: [String] = sortedPads.map { $0.name }
         var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
         var computationLength: Int64 = Int64(self.nets.count)
