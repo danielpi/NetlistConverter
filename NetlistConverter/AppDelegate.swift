@@ -18,12 +18,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var numericOrder = false
 
-    func applicationDidFinishLaunching(aNotification: NSNotification?) {
+    func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application
         self.progressIndicator.hidden = true
     }
 
-    func applicationWillTerminate(aNotification: NSNotification?) {
+    func applicationWillTerminate(aNotification: NSNotification) {
         // Insert code here to tear down your application
     }
 
@@ -38,23 +38,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             result in
             if result == NSFileHandlingPanelOKButton {
                 let urls = panel.URLs as NSArray
-                let url = urls.firstObject as NSURL
-                let fileContents = NSString(contentsOfURL: url, encoding: NSUTF8StringEncoding, error: nil)
-                if let contents = fileContents {
-                    
-                    switch url.pathExtension {
+                let url = urls.firstObject as! NSURL
+                let fileContents: NSString?
+                do {
+                    fileContents = try NSString(contentsOfURL: url, encoding: NSUTF8StringEncoding)
+                } catch _ {
+                    fileContents = nil
+                }
+                if let contents = fileContents, let pathExt = url.pathExtension {
+                    switch pathExt {
                     case "net", "NET":
                         self.numericOrder = false
-                        let fileNetlist = Netlist(fromString: contents)
-                        self.netlist = Netlist(fromString: contents)
+                        let fileNetlist = Netlist(fromString: contents as String)
+                        self.netlist = Netlist(fromString: contents as String)
                         fileNetlist.prettyPrint()
                     case "repnl", "REPNL":
                         self.numericOrder = true
-                        let fileNetlist = Netlist(REPNLFromString: contents)
+                        //let fileNetlist = Netlist(REPNLFromString as REPNLString: contents)
+                        let fileNetlist = Netlist(REPNLFromString: contents as REPNLString)
                         self.netlist = fileNetlist
                         fileNetlist.prettyPrint()
                     default:
-                        println("Tried to use a txt file")
+                        print("Tried to use a txt file")
                     }
                     
                 } else {
@@ -79,7 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         // Set up a progress object
                         self.progressIndicator.hidden = false
                         let progress = NSProgress(totalUnitCount: 2)
-                        let options : NSKeyValueObservingOptions = .New | .Old | .Initial | .Prior
+                        let options : NSKeyValueObservingOptions = [.New, .Old, .Initial, .Prior]
                         progress.addObserver(self, forKeyPath: "fractionCompleted", options: options, context: nil)
                         
                         let queue: dispatch_queue_t = dispatch_queue_create("My Queue", DISPATCH_QUEUE_SERIAL)
@@ -90,8 +95,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                             progress.resignCurrent()
                             progress.becomeCurrentWithPendingUnitCount(1)
                             let output = connectionMatrix.description(!(self.numericOrder))
-                            //print(output)
-                            output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding, error: nil)
+                            do {
+                                //print(output)
+                                try output.writeToURL(url, atomically: true, encoding: NSMacOSRomanStringEncoding)
+                            } catch _ {
+                            }
                             progress.resignCurrent()
                         }
                     }
@@ -105,9 +113,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     //override func observeValueForKeyPath(keyPath: String!, ofObject object: AnyObject!, change: [NSObject : AnyObject]!, context: UnsafePointer<()>) {
-    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<()>) {
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [NSObject : AnyObject]?, context: UnsafeMutablePointer<()>) {
         NSOperationQueue.mainQueue().addOperationWithBlock( {
-                let progress = object as NSProgress
+                let progress = object as! NSProgress
                 self.progressIndicator.doubleValue = ceil(progress.fractionCompleted * 100.0) / 100.0
                 //println("\(progress.fractionCompleted)")
             } )

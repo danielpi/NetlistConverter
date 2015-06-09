@@ -9,7 +9,7 @@
 import Foundation
 import Cocoa
 
-class Pad: Printable {
+class Pad: CustomStringConvertible {
     let pinNumber: Int?
     let pinName: String?
     let component: Component
@@ -114,27 +114,27 @@ public class ConnectionMatrix {
         assert(rowHeaders.count == rowSet.count, "There are duplicate labels in the Row Headers")
         assert(colHeaders.count == colSet.count, "There are duplicate labels in the Column Headers")
         
-        for (index, row) in enumerate(rowHeaders) {
+        for (index, row) in rowHeaders.enumerate() {
             self.rowHeaderDictionary[row] = index
         }
-        for (index, col) in enumerate(colHeaders) {
+        for (index, col) in colHeaders.enumerate() {
             self.colHeaderDictionary[col] = index
         }
         grid = Array(count:self.rowHeaderDictionary.count * self.colHeaderDictionary.count, repeatedValue: false)
     }
     convenience init(nets: [Net]) {
-        var headers: NSMutableSet = NSMutableSet()
+        let headers: NSMutableSet = NSMutableSet()
         for net in nets {
             for pad in net.pads {
                 headers.addObject(pad.name)
             }
         }
-        let padLabels: [String] = headers.allObjects as [String]
-        let sortedLabels = sorted(padLabels)
+        let padLabels: [String] = headers.allObjects as! [String]
+        let sortedLabels = padLabels.sort()
         self.init(rowHeaders: sortedLabels, colHeaders: sortedLabels)
         
         for net in nets {
-            println(net.name)
+            print(net.name)
             for pad in net.pads {
                 for secondPad in net.pads {
                     self[pad.name, secondPad.name] = true
@@ -191,8 +191,8 @@ public class ConnectionMatrix {
     }
     
     func description(displayRowHeaders: Bool) -> String {
-        var computationLength: Int64 = Int64(rowHeaderDictionary.count)
-        var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
+        let computationLength: Int64 = Int64(rowHeaderDictionary.count)
+        let progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
         // Create the column header
         var response = ""
@@ -205,11 +205,11 @@ public class ConnectionMatrix {
         response += "\n"
         
         // Create each row
-        for (rowIndex, row) in enumerate(rowHeaders) {
+        for (rowIndex, row) in rowHeaders.enumerate() {
             if displayRowHeaders {
                 response += "\(row):\t"
             }
-            for (colIndex, col) in enumerate(colHeaders) {
+            for (colIndex, _) in colHeaders.enumerate() {
                 //let status = self[rowIndex, colIndex] ? 1 : 0
                 //response += "\(status) "
                 response += self[rowIndex, colIndex] ? "1 " : "0 "
@@ -220,7 +220,7 @@ public class ConnectionMatrix {
         return response
     }
     func prettyPrint() {
-        print(self.description(true))
+        print(self.description(true), appendNewline: false)
     }
 }
 
@@ -267,7 +267,7 @@ public class Netlist {
         var componentBuffer: String? = nil
         var netBuffer: String? = nil
         
-        for character in string {
+        for character in string.characters {
             switch character {
             case "[":
                 componentBuffer = "["
@@ -296,13 +296,13 @@ public class Netlist {
         
         let netStrings = string.componentsSeparatedByString("\n")
         for netString in netStrings {
-            println("\(netString)")
+            print("\(netString)")
             let aNet = Net(name: "abc")
             
             let netScanner = NSScanner(string: netString)
             var pointNumber: CInt = 0
             while (netScanner.scanInt(&pointNumber)) {
-                println("\(pointNumber)")
+                print("\(pointNumber)")
                 let aComponent = Component(designator: "\(pointNumber)")
                 let aPad = Pad(pinNumber: Int(pointNumber), pinName: nil, component: aComponent)
                 aComponent.pads.append(aPad)
@@ -331,11 +331,11 @@ public class Netlist {
     func parseComponent(fromString string: String) {
         let fragments = string.componentsSeparatedByString("\r\n")
         if fragments[0] == "[" {
-            var aComponent = Component(designator: fragments[1])
-            if countElements(fragments[2]) > 0 {
+            let aComponent = Component(designator: fragments[1])
+            if fragments[2].characters.count > 0 {
                 aComponent.footprint = fragments[2]
             }
-            if countElements(fragments[3]) > 0 {
+            if fragments[3].characters.count > 0 {
                 aComponent.value = fragments[3]
             }
             self.components += [aComponent]
@@ -358,20 +358,20 @@ public class Netlist {
         let fragments = string.componentsSeparatedByString("\r\n")
         //println(fragments)
         if fragments[0] == "(" {
-            var aNet = Net(name: fragments[1])
+            let aNet = Net(name: fragments[1])
             for padString in fragments[2..<(fragments.count - 1)] {
                 let sections = padString.componentsSeparatedByString("-")
                 var matchingComponents = self.components.filter { $0.designator == sections[0] }
                 if matchingComponents.count > 0 {
-                    var aComponent = matchingComponents[0]
+                    let aComponent = matchingComponents[0]
                     let name: String? = (sections[1] == "") ? nil : sections[1]
-                    let aPad = Pad(pinNumber: sections[1].toInt(), pinName: name, component: aComponent)
+                    let aPad = Pad(pinNumber: Int(sections[1]), pinName: name, component: aComponent)
                     //pads += aPad
                     aComponent.pads += [aPad]
                     //println("added \(aPad.description()) to \(aComponent.description())")
                     aNet.pads += [aPad]
                 } else {
-                    println("\(padString) not found in the list of components")
+                    print("\(padString) not found in the list of components")
                 }
             }
             self.nets += [aNet]
@@ -390,43 +390,43 @@ public class Netlist {
         // Search through the nets to see if the pad is present
         return nil
     }
-    func connect(#pad: Pad, toPad: Pad) {
+    func connect(pad pad: Pad, toPad: Pad) {
         // Find if either pad is a part of a net. 
         // if one or the other is but not both then add one to the net of the other
         // if both are in nets combine the two nets
         // if neither are in nets, create a new net and add them both
     }
-    func connect(#net: Net, toNet: Net) {
+    func connect(net net: Net, toNet: Net) {
         // Combine two nets
     }
-    func connect(#pad: Pad, toNet: Net) {
+    func connect(pad pad: Pad, toNet: Net) {
         
     }
     
     
     public func prettyPrint() {
         for component in components {
-            println(component.description())
+            print(component.description())
         }
         for net in nets {
-            println(net.description())
+            print(net.description())
         }
     }
     
     // Should this be a calculated property???
     public func exportConnectionMatrix(numericOrder: Bool) -> ConnectionMatrix {
         //let matrix: ConnectionMatrix = ConnectionMatrix(nets: nets)
-        var sortedPads = sorted(pads){ $0.name < $1.name }
+        var sortedPads = pads.sort{ $0.name < $1.name }
         if numericOrder {
-            sortedPads = sorted(pads){ $0.pinNumber! < $1.pinNumber! }
+            sortedPads = pads.sort{ $0.pinNumber! < $1.pinNumber! }
         }
         let padLabels: [String] = sortedPads.map { $0.name }
-        var matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
-        var computationLength: Int64 = Int64(self.nets.count)
-        var progress: NSProgress = NSProgress(totalUnitCount: computationLength)
+        let matrix: ConnectionMatrix = ConnectionMatrix(rowHeaders: padLabels, colHeaders: padLabels)
+        let computationLength: Int64 = Int64(self.nets.count)
+        let progress: NSProgress = NSProgress(totalUnitCount: computationLength)
         
         netLoop: for net in self.nets {
-            print(net.name + " ")
+            print(net.name + " ", appendNewline: false)
             if progress.cancelled {
                 break //netLoop
             } else {

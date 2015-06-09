@@ -28,7 +28,12 @@ class NetlistConverterTests: XCTestCase {
         //println(testDataPath)
         if let validTestDataPath = testDataPath {
             let testDataURL = NSURL(fileURLWithPath: validTestDataPath, isDirectory: false)
-            let fileContents = NSString(contentsOfURL: testDataURL!, encoding: NSUTF8StringEncoding, error: nil)
+            let fileContents: NSString?
+            do {
+                fileContents = try NSString(contentsOfURL: testDataURL, encoding: NSUTF8StringEncoding)
+            } catch _ {
+                fileContents = nil
+            }
             return fileContents
         } else {
             return nil
@@ -81,7 +86,7 @@ class NetlistConverterTests: XCTestCase {
         let testBundle = NSBundle(forClass: NetlistConverterTests.classForKeyedArchiver()!)
         let testDataPath = testBundle.pathForResource("FluroNetlist", ofType:"REPNL")
         let testDataURL = NSURL(fileURLWithPath: testDataPath!, isDirectory: false)
-        let fileContents: REPNLString = NSString(contentsOfURL: testDataURL!, encoding: NSUTF8StringEncoding, error: nil)!
+        let fileContents: REPNLString = NSString(contentsOfURL: testDataURL, encoding: NSUTF8StringEncoding, error: nil)!
         
         let fileNetlist = Netlist(REPNLFromString: String(fileContents))
         fileNetlist.prettyPrint()
